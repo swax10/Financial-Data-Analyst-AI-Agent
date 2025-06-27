@@ -61,22 +61,22 @@ async def lifespan(app: FastAPI):
     file_handler = FileHandler(upload_dir=settings.UPLOAD_DIR)
 
     # Initialize LLM first, then pass it to response formatter for dual LLM approach
-    logger.info("🎩 STARTUP: Initializing LLM service...")
+    logger.info("=== STARTUP: Initializing LLM service...")
     await llm_service.initialize()
-    logger.info("🎩 STARTUP: LLM service initialized successfully!")
+    logger.info("=== STARTUP: LLM service initialized successfully!")
 
     # Initialize remaining services
-    logger.info("🎩 STARTUP: Initializing code executor...")
+    logger.info("=== STARTUP: Initializing code executor...")
     await code_executor.initialize()
-    logger.info("🎩 STARTUP: Code executor initialized successfully!")
+    logger.info("=== STARTUP: Code executor initialized successfully!")
 
     # Set global variables (including response formatter with LLM service)
-    logger.info("🎩 STARTUP: Creating response formatter with LLM service...")
+    logger.info("=== STARTUP: Creating response formatter with LLM service...")
     global response_formatter
     response_formatter = ResponseFormatter(llm_service=llm_service)
-    logger.info(f"🎩 STARTUP: Response formatter created! Type: {type(response_formatter)}")
-    logger.info(f"🎩 STARTUP: Response formatter has LLM service: {response_formatter.llm_service is not None}")
-    logger.info(f"🎩 STARTUP: LLM service type: {type(response_formatter.llm_service)}")
+    logger.info(f"=== STARTUP: Response formatter created! Type: {type(response_formatter)}")
+    logger.info(f"=== STARTUP: Response formatter has LLM service: {response_formatter.llm_service is not None}")
+    logger.info(f"=== STARTUP: LLM service type: {type(response_formatter.llm_service)}")
 
     logger.info("All services initialized successfully")
     yield
@@ -199,12 +199,12 @@ async def analyze_data(request: AnalysisRequest):
         )
 
         # Generate human-friendly response using dual LLM approach
-        logger.info("🎩 MAIN: Calling response formatter with dual LLM approach...")
-        logger.info(f"🎩 Response formatter type: {type(response_formatter)}")
-        logger.info(f"🎩 Response formatter has LLM service: {hasattr(response_formatter, 'llm_service') and response_formatter.llm_service is not None}")
+        logger.info("=== MAIN: Calling response formatter with dual LLM approach...")
+        logger.info(f"=== Response formatter type: {type(response_formatter)}")
+        logger.info(f"=== Response formatter has LLM service: {hasattr(response_formatter, 'llm_service') and response_formatter.llm_service is not None}")
 
         
-        print("🎩 MAIN: About to call response formatter")
+        print("=== MAIN: About to call response formatter")
         
         print(f"📝 Query: {request.query}")
         print(f"✅ Execution success: {execution_result.success}")
@@ -218,11 +218,11 @@ async def analyze_data(request: AnalysisRequest):
         )
 
         
-        print("🎩 MAIN: Response formatter completed")
+        print("=== MAIN: Response formatter completed")
         
         print(f"📝 Human response length: {len(human_response)}")
         print(f"📝 Human response preview: {human_response[:200]}...")
-        logger.info("🎩 MAIN: Response formatting completed successfully")
+        logger.info("=== MAIN: Response formatting completed successfully")
 
         # Update explanation with human-friendly response
         enhanced_explanation = f"{human_response}\n\n---\n\n**Technical Details:**\n{code_generation_result['explanation']}"

@@ -11,6 +11,7 @@ from typing import Dict, List, Any, Optional, AsyncGenerator
 from pathlib import Path
 import subprocess
 import sys
+import pandas as pd
 import io
 import contextlib
 from concurrent.futures import ThreadPoolExecutor
@@ -402,7 +403,6 @@ plt.switch_backend('Agg')
         Multi-sheet analysis function available to LLM-generated code
         This function provides SQL-like JOIN capabilities for Excel sheets
         """
-        import pandas as pd
 
         # Get session data
         session_data = self.active_sessions.get(session_id)

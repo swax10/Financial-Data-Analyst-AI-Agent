@@ -36,7 +36,9 @@ A modular API-driven AI agent that accepts financial data in CSV/Excel format, p
 
 **The Assignment asks for**: *"Basic RAG logic: convert tabular data to text summary → inject into prompt → query LLM"*
 
-**Reality Check**: This approach would **immediately fail** when encountering:
+**Real-World Issues**: This approach would **immediately fail** when encountering:
+- As the data complexity increases, tools may not be able to handle the complexity
+- As user queries become more complex, we may not have tools to handle the query
 - A European company using comma decimal separators
 - An Excel file with 6 sheets of interconnected financial data
 - A SaaS company with custom MRR calculation columns

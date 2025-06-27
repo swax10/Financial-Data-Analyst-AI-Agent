@@ -90,18 +90,18 @@ class DataProcessor:
                 result["all_sheets"]["relationships"] = self._analyze_sheet_relationships()
 
                 # DEEP DEBUG: Log the final result structure
-                logger.info("🎯" * 80)
-                logger.info("🎯 FINAL RESULT ASSEMBLY - DEEP DEBUG")
-                logger.info("🎯" * 80)
-                logger.info(f"🎯 Result keys: {list(result.keys())}")
-                logger.info(f"🎯 all_sheets keys: {list(result['all_sheets'].keys())}")
-                logger.info(f"🎯 Sheet count in result: {result['all_sheets']['sheet_count']}")
-                logger.info(f"🎯 Sheet names in result: {result['all_sheets']['sheet_names']}")
-                logger.info(f"🎯 Primary sheet in result: {result['all_sheets']['primary_sheet']}")
-                logger.info(f"🎯 Metadata keys in result: {list(result['all_sheets']['metadata'].keys())}")
-                logger.info("🎯" * 80)
+                
+                logger.info("=== FINAL RESULT ASSEMBLY - DEEP DEBUG")
+                
+                logger.info(f"=== Result keys: {list(result.keys())}")
+                logger.info(f"=== all_sheets keys: {list(result['all_sheets'].keys())}")
+                logger.info(f"=== Sheet count in result: {result['all_sheets']['sheet_count']}")
+                logger.info(f"=== Sheet names in result: {result['all_sheets']['sheet_names']}")
+                logger.info(f"=== Primary sheet in result: {result['all_sheets']['primary_sheet']}")
+                logger.info(f"=== Metadata keys in result: {list(result['all_sheets']['metadata'].keys())}")
+                
             else:
-                logger.info("🎯 No multi-sheet data found - single sheet file")
+                logger.info("=== No multi-sheet data found - single sheet file")
 
             return result
 
@@ -238,21 +238,21 @@ class DataProcessor:
             self._sheet_metadata = sheet_metadata
 
             # DEEP DEBUG: Log the metadata being created
-            logger.info("📊" * 80)
-            logger.info("📊 MULTI-SHEET METADATA GENERATION - DEEP DEBUG")
-            logger.info("📊" * 80)
-            logger.info(f"📊 Total sheets loaded: {len(all_sheets_data)}")
-            logger.info(f"📊 Sheet names: {list(all_sheets_data.keys())}")
-            logger.info(f"📊 Metadata keys: {list(sheet_metadata.keys())}")
+            
+            logger.info("=== MULTI-SHEET METADATA GENERATION - DEEP DEBUG")
+            
+            logger.info(f"=== Total sheets loaded: {len(all_sheets_data)}")
+            logger.info(f"=== Sheet names: {list(all_sheets_data.keys())}")
+            logger.info(f"=== Metadata keys: {list(sheet_metadata.keys())}")
 
             for sheet_name, metadata in sheet_metadata.items():
-                logger.info(f"📊 Sheet '{sheet_name}':")
-                logger.info(f"📊   - Rows: {metadata.get('row_count', 0)}")
-                logger.info(f"📊   - Columns: {metadata.get('columns', [])}")
-                logger.info(f"📊   - Financial score: {metadata.get('financial_score', 0):.1f}/10.0")
-                logger.info(f"📊   - Description: {metadata.get('description', 'N/A')}")
+                logger.info(f"=== Sheet '{sheet_name}':")
+                logger.info(f"===   - Rows: {metadata.get('row_count', 0)}")
+                logger.info(f"===   - Columns: {metadata.get('columns', [])}")
+                logger.info(f"===   - Financial score: {metadata.get('financial_score', 0):.1f}/10.0")
+                logger.info(f"===   - Description: {metadata.get('description', 'N/A')}")
 
-            logger.info("📊" * 80)
+            
 
             # For backward compatibility, return the "primary" sheet
             # But now LLM can access all sheets via metadata

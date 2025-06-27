@@ -211,32 +211,32 @@ class LLMService:
 
             # DEEP DEBUG: Log the exact prompts being sent to LLM
 
-            logger.info("🚀 ABOUT TO CALL LLM - DEEP DEBUG")
+            logger.info("=== ABOUT TO CALL LLM - DEEP DEBUG")
 
-            logger.info(f"🚀 System prompt length: {len(system_prompt)} characters")
-            logger.info(f"🚀 User prompt length: {len(user_prompt)} characters")
-            logger.info(f"🚀 Tools provided: 0 tools (REMOVED FOR COMPLETE FREEDOM!)")
-            logger.info(f"🚀 Temperature: {settings.LLM_TEMPERATURE}")
-            logger.info(f"🚀 Max tokens: {settings.LLM_MAX_TOKENS}")
+            logger.info(f"=== System prompt length: {len(system_prompt)} characters")
+            logger.info(f"=== User prompt length: {len(user_prompt)} characters")
+            logger.info(f"=== Tools provided: 0 tools (REMOVED FOR COMPLETE FREEDOM!)")
+            logger.info(f"=== Temperature: {settings.LLM_TEMPERATURE}")
+            logger.info(f"=== Max tokens: {settings.LLM_MAX_TOKENS}")
 
-            logger.info("🚀 SYSTEM PROMPT BEING SENT:")
+            logger.info("=== SYSTEM PROMPT BEING SENT:")
 
             logger.info(system_prompt)
 
-            logger.info("🚀 USER PROMPT BEING SENT:")
+            logger.info("=== USER PROMPT BEING SENT:")
 
             logger.info(user_prompt)
 
 
-            # 🚀 STEP 1: TRY REAL TOKEN PRIMING FIRST
-            logger.info("🚀 ATTEMPTING REAL TOKEN PRIMING - Pre-filling assistant response...")
+            # === STEP 1: TRY REAL TOKEN PRIMING FIRST
+            logger.info("=== ATTEMPTING REAL TOKEN PRIMING - Pre-filling assistant response...")
 
             try:
                 # Generate code using real token priming technique
                 generated_code = self._create_chat_completion_with_prefill(query, file_info, file_path)
 
                 if generated_code and len(generated_code.strip()) > 50:
-                    logger.info("🎉 ✅ REAL TOKEN PRIMING WORKED! Generated code successfully!")
+                    logger.info("=== ✅ REAL TOKEN PRIMING WORKED! Generated code successfully!")
                     logger.info(f"Generated code length: {len(generated_code)}")
                     logger.info(f"Code preview: {generated_code[:200]}...")
 
@@ -247,16 +247,16 @@ class LLMService:
                         "arguments": {"query": query}
                     }
                 else:
-                    logger.info("🚨 Real token priming generated short/empty response, falling back...")
+                    logger.info("Real token priming generated short/empty response, falling back...")
 
             except Exception as e:
-                logger.error(f"🚨 Real token priming failed: {e}")
+                logger.error(f"Real token priming failed: {e}")
 
             # 🔄 STEP 2: FALLBACK TO OLD APPROACH
             logger.info("🔄 Falling back to old token priming approach...")
 
             # Get LLM response WITHOUT TOOLS - Complete freedom approach!
-            logger.info("🚀 CALLING LLM WITHOUT TOOLS - COMPLETE FREEDOM!")
+            logger.info("=== CALLING LLM WITHOUT TOOLS - COMPLETE FREEDOM!")
             output = self.llm.create_chat_completion(
                 messages=[
                     {
@@ -274,53 +274,53 @@ class LLMService:
             )
 
             # Add detailed logging to understand LLM output structure
-            logger.info("🎉" * 80)
-            logger.info("🎉 LLM RESPONSE RECEIVED - DEEP ANALYSIS")
-            logger.info("🎉" * 80)
-            logger.info(f"🎉 Full LLM output keys: {list(output.keys())}")
-            logger.info(f"🎉 Choices length: {len(output.get('choices', []))}")
+            
+            logger.info("=== LLM RESPONSE RECEIVED - DEEP ANALYSIS")
+            
+            logger.info(f"=== Full LLM output keys: {list(output.keys())}")
+            logger.info(f"=== Choices length: {len(output.get('choices', []))}")
 
             message = output['choices'][0]['message']
-            logger.info(f"🎉 Message keys: {list(message.keys())}")
+            logger.info(f"=== Message keys: {list(message.keys())}")
 
             content = message.get('content', '')
-            logger.info(f"🎉 Content type: {type(content)}")
-            logger.info(f"🎉 Content length: {len(content) if content else 0}")
-            logger.info(f"🎉 Content preview (first 500 chars):")
-            logger.info(f"🎉 {content[:500] if content else 'None'}")
+            logger.info(f"=== Content type: {type(content)}")
+            logger.info(f"=== Content length: {len(content) if content else 0}")
+            logger.info(f"=== Content preview (first 500 chars):")
+            logger.info(f"=== {content[:500] if content else 'None'}")
 
             # Check for tool_calls (newer OpenAI format)
             tool_calls = message.get('tool_calls', [])
-            logger.info(f"🎉 Tool calls found: {len(tool_calls)}")
+            logger.info(f"=== Tool calls found: {len(tool_calls)}")
             if tool_calls:
-                logger.info(f"🎉 Tool calls structure: {tool_calls}")
+                logger.info(f"=== Tool calls structure: {tool_calls}")
 
             # Analyze content format with better detection
             if content:
                 content_stripped = content.strip()
                 if content_stripped.startswith('[{') and '"name"' in content and '"arguments"' in content:
-                    logger.info("🎉 ❌ FUNCTION CALLS DETECTED! LLM still trying to use functions!")
+                    logger.info("=== ❌ FUNCTION CALLS DETECTED! LLM still trying to use functions!")
                 elif content_stripped.startswith('import') and not content_stripped.startswith('[{'):
-                    logger.info("🎉 ✅ PYTHON CODE DETECTED! LLM generated direct code!")
+                    logger.info("=== ✅ PYTHON CODE DETECTED! LLM generated direct code!")
                 elif content_stripped.startswith('```python'):
-                    logger.info("🎉 📝 MARKDOWN CODE BLOCK DETECTED!")
+                    logger.info("=== 📝 MARKDOWN CODE BLOCK DETECTED!")
                 elif 'pd.' in content and not content_stripped.startswith('[{'):
-                    logger.info("🎉 ✅ PYTHON CODE WITH PANDAS DETECTED!")
+                    logger.info("=== ✅ PYTHON CODE WITH PANDAS DETECTED!")
                 else:
-                    logger.info("🎉 ⚠️ UNCLEAR CONTENT FORMAT - Need to investigate")
-                    logger.info(f"🎉 First 100 chars: {content[:100]}")
-                    logger.info(f"🎉 Starts with '[{{': {content_stripped.startswith('[{')}")
-                    logger.info(f"🎉 Contains 'name': {'name' in content}")
-                    logger.info(f"🎉 Contains 'arguments': {'arguments' in content}")
+                    logger.info("=== ⚠️ UNCLEAR CONTENT FORMAT - Need to investigate")
+                    logger.info(f"=== First 100 chars: {content[:100]}")
+                    logger.info(f"=== Starts with '[{{': {content_stripped.startswith('[{')}")
+                    logger.info(f"=== Contains 'name': {'name' in content}")
+                    logger.info(f"=== Contains 'arguments': {'arguments' in content}")
             else:
-                logger.info("🎉 ❌ NO CONTENT RECEIVED!")
+                logger.info("=== ❌ NO CONTENT RECEIVED!")
 
-            logger.info("🎉" * 80)
+            
 
             # PRIORITIZE DIRECT CODE OVER FUNCTION CALLS
-            logger.info("🎯" * 80)
-            logger.info("🎯 PROCESSING LLM RESPONSE - PRIORITIZING DIRECT CODE")
-            logger.info("🎯" * 80)
+            
+            logger.info("=== PROCESSING LLM RESPONSE - PRIORITIZING DIRECT CODE")
+            
 
             # Check if LLM generated direct Python code (improved detection)
             content_stripped = content.strip() if content else ""
@@ -329,7 +329,7 @@ class LLMService:
                             (('pd.' in content or 'pandas' in content) and not is_function_call))
 
             if content and is_python_code and not is_function_call:
-                logger.info("🎯 ✅ DIRECT PYTHON CODE DETECTED - USING IT!")
+                logger.info("=== ✅ DIRECT PYTHON CODE DETECTED - USING IT!")
 
                 # Clean up the code if it's in markdown format
                 clean_code = content
@@ -339,17 +339,17 @@ class LLMService:
                     end = content.find('```', start)
                     if end != -1:
                         clean_code = content[start:end].strip()
-                        logger.info("🎯 Extracted code from markdown format")
+                        logger.info("=== Extracted code from markdown format")
                 elif '```' in content:
                     # Extract code from generic markdown
                     start = content.find('```') + 3
                     end = content.find('```', start)
                     if end != -1:
                         clean_code = content[start:end].strip()
-                        logger.info("🎯 Extracted code from generic markdown format")
+                        logger.info("=== Extracted code from generic markdown format")
 
-                logger.info(f"🎯 Final code length: {len(clean_code)} characters")
-                logger.info(f"🎯 Code preview: {clean_code[:200]}...")
+                logger.info(f"=== Final code length: {len(clean_code)} characters")
+                logger.info(f"=== Code preview: {clean_code[:200]}...")
 
                 return {
                     "code": clean_code,
@@ -360,7 +360,7 @@ class LLMService:
 
             # Fallback: Check for function calls (legacy support)
             elif content and content.startswith('['):
-                logger.info("🎯 ⚠️ FUNCTION CALLS DETECTED - LLM IGNORED INSTRUCTIONS!")
+                logger.info("=== ⚠️ FUNCTION CALLS DETECTED - LLM IGNORED INSTRUCTIONS!")
                 try:
                     function_calls = json.loads(content)
                     if function_calls:
@@ -368,7 +368,7 @@ class LLMService:
                         function_name = call['name']
                         arguments = call['arguments']
 
-                        logger.info(f"🎯 Function call: {function_name} with args: {arguments}")
+                        logger.info(f"=== Function call: {function_name} with args: {arguments}")
 
                         # Generate code based on function call
                         code_result = self._generate_code_from_function(
@@ -383,15 +383,15 @@ class LLMService:
                         }
 
                 except (json.JSONDecodeError, KeyError) as e:
-                    logger.error(f"🎯 Failed to parse function calls: {e}")
-                    logger.info("🎯 Falling back to direct code generation")
+                    logger.error(f"=== Failed to parse function calls: {e}")
+                    logger.info("=== Falling back to direct code generation")
                     # Fallback to direct code generation
                     return self._generate_direct_code(query, file_info, file_path)
             else:
-                logger.info("🎯 ⚠️ NO RECOGNIZABLE CODE OR FUNCTION CALLS")
-                logger.info(f"🎯 Content preview: '{content[:100]}...' if content else 'Empty content'")
+                logger.info("=== ⚠️ NO RECOGNIZABLE CODE OR FUNCTION CALLS")
+                logger.info(f"=== Content preview: '{content[:100]}...' if content else 'Empty content'")
                 # Fallback to direct code generation
-                logger.info("🎯 Using fallback direct code generation")
+                logger.info("=== Using fallback direct code generation")
                 return self._generate_direct_code(query, file_info, file_path)
 
         except Exception as e:
@@ -400,33 +400,33 @@ class LLMService:
 
     def _create_system_prompt(self, file_info: Dict[str, Any]) -> str:
         """Create system prompt based on file information"""
-        logger.info("🔍 SYSTEM PROMPT GENERATION - DEEP DEBUG")
-        logger.info(f"🔍 file_info keys: {list(file_info.keys())}")
-        logger.info(f"🔍 file_info type: {type(file_info)}")
+        logger.info("=== SYSTEM PROMPT GENERATION - DEEP DEBUG")
+        logger.info(f"=== file_info keys: {list(file_info.keys())}")
+        logger.info(f"=== file_info type: {type(file_info)}")
 
         columns = file_info.get('columns', [])
         financial_patterns = file_info.get('financial_patterns', {})
 
-        logger.info(f"🔍 Primary columns: {columns}")
-        logger.info(f"🔍 Financial patterns: {financial_patterns}")
+        logger.info(f"=== Primary columns: {columns}")
+        logger.info(f"=== Financial patterns: {financial_patterns}")
 
         # Check for multi-sheet information
         all_sheets = file_info.get('all_sheets', {})
-        logger.info(f"🔍 all_sheets keys: {list(all_sheets.keys()) if all_sheets else 'None'}")
-        logger.info(f"🔍 all_sheets type: {type(all_sheets)}")
+        logger.info(f"=== all_sheets keys: {list(all_sheets.keys()) if all_sheets else 'None'}")
+        logger.info(f"=== all_sheets type: {type(all_sheets)}")
 
         if all_sheets:
-            logger.info(f"🔍 Sheet count: {all_sheets.get('sheet_count', 'Unknown')}")
-            logger.info(f"🔍 Primary sheet: {all_sheets.get('primary_sheet', 'Unknown')}")
-            logger.info(f"🔍 Sheet names: {all_sheets.get('sheet_names', [])}")
+            logger.info(f"=== Sheet count: {all_sheets.get('sheet_count', 'Unknown')}")
+            logger.info(f"=== Primary sheet: {all_sheets.get('primary_sheet', 'Unknown')}")
+            logger.info(f"=== Sheet names: {all_sheets.get('sheet_names', [])}")
 
             metadata = all_sheets.get('metadata', {})
-            logger.info(f"🔍 Metadata keys: {list(metadata.keys()) if metadata else 'None'}")
+            logger.info(f"=== Metadata keys: {list(metadata.keys()) if metadata else 'None'}")
 
             for sheet_name, sheet_info in metadata.items():
-                logger.info(f"🔍 Sheet '{sheet_name}': {sheet_info.get('columns', [])} ({sheet_info.get('row_count', 0)} rows)")
+                logger.info(f"=== Sheet '{sheet_name}': {sheet_info.get('columns', [])} ({sheet_info.get('row_count', 0)} rows)")
         else:
-            logger.info("🔍 No multi-sheet information found!")
+            logger.info("=== No multi-sheet information found!")
 
         base_prompt = f"""You are a financial data analysis expert. You MUST generate ONLY Python code using pandas, matplotlib, and seaborn for analyzing financial data.
 
@@ -530,12 +530,12 @@ print(f"Total: ${{total:,.2f}}")
 🚨 ALWAYS CLEAN FINANCIAL DATA BEFORE CALCULATIONS
 🚨 GENERATE PYTHON CODE NOW - NO EXCEPTIONS:"""
 
-        logger.info("🔍 FINAL SYSTEM PROMPT GENERATED")
-        logger.info(f"🔍 System prompt length: {len(base_prompt)} characters")
-        logger.info(f"🔍 System prompt preview (first 500 chars):")
-        logger.info(f"🔍 {base_prompt[:500]}...")
-        logger.info(f"🔍 System prompt preview (last 500 chars):")
-        logger.info(f"🔍 ...{base_prompt[-500:]}")
+        logger.info("=== FINAL SYSTEM PROMPT GENERATED")
+        logger.info(f"=== System prompt length: {len(base_prompt)} characters")
+        logger.info(f"=== System prompt preview (first 500 chars):")
+        logger.info(f"=== {base_prompt[:500]}...")
+        logger.info(f"=== System prompt preview (last 500 chars):")
+        logger.info(f"=== ...{base_prompt[-500:]}")
 
         return base_prompt
 
@@ -1667,7 +1667,7 @@ print(f"\\n✅ Burn rate and runway analysis completed!")
         Returns:
             dict: Executive summary with insights and recommendations
         """
-        logger.info("🎩 LLM #2: Starting executive summary generation...")
+        logger.info("=== LLM #2: Starting executive summary generation...")
         logger.info(f"Query: {user_query}")
         logger.info(f"Technical results length: {len(technical_results)}")
         logger.info(f"Execution success: {execution_success}")
@@ -1727,10 +1727,10 @@ Make it sound like advice from a senior financial advisor to an executive.
 """
 
             # Generate executive summary using REAL TOKEN PRIMING for LLM #2
-            logger.info("🎩 LLM #2: About to use REAL TOKEN PRIMING for executive summary...")
-            logger.info(f"🎩 System prompt length: {len(system_prompt)}")
-            logger.info(f"🎩 User prompt length: {len(user_prompt)}")
-            logger.info("🎩 LLM #2: Using real token priming to force human-friendly response...")
+            logger.info("=== LLM #2: About to use REAL TOKEN PRIMING for executive summary...")
+            logger.info(f"=== System prompt length: {len(system_prompt)}")
+            logger.info(f"=== User prompt length: {len(user_prompt)}")
+            logger.info("=== LLM #2: Using real token priming to force human-friendly response...")
 
             # Create pre-filled assistant response for LLM #2 (Real Token Priming)
             response_prefill = f"""Based on the financial analysis of your data, here are the key findings:
@@ -1745,8 +1745,8 @@ The analysis of your financial data reveals"""
                 {"role": "assistant", "content": response_prefill}  # Pre-fill to force continuation
             ]
 
-            logger.info("🎩 LLM #2: REAL TOKEN PRIMING - Pre-filling assistant response...")
-            logger.info(f"🎩 LLM #2: Pre-fill content: {response_prefill}")
+            logger.info("=== LLM #2: REAL TOKEN PRIMING - Pre-filling assistant response...")
+            logger.info(f"=== LLM #2: Pre-fill content: {response_prefill}")
 
             # LLM continues from where the "assistant" left off
             response = self.llm.create_chat_completion(
@@ -1757,19 +1757,19 @@ The analysis of your financial data reveals"""
                 stop=["```", "Human:", "User:", "[{", '{"name":', '"arguments"']  # Stop at function calls
             )
 
-            logger.info("🎩 LLM #2: Received response from LLM!")
-            logger.info(f"🎩 Response keys: {list(response.keys())}")
-            logger.info(f"🎩 Choices count: {len(response.get('choices', []))}")
+            logger.info("=== LLM #2: Received response from LLM!")
+            logger.info(f"=== Response keys: {list(response.keys())}")
+            logger.info(f"=== Choices count: {len(response.get('choices', []))}")
 
             # Get the continuation from LLM and combine with pre-fill
             continuation = response['choices'][0]['message']['content'].strip()
             executive_summary = response_prefill + " " + continuation
 
-            logger.info("🎩 LLM #2: REAL TOKEN PRIMING WORKED! Executive summary generated successfully!")
-            logger.info(f"🎩 LLM #2: Pre-fill length: {len(response_prefill)}")
-            logger.info(f"🎩 LLM #2: Continuation length: {len(continuation)}")
-            logger.info(f"🎩 LLM #2: Total summary length: {len(executive_summary)}")
-            logger.info(f"🎩 LLM #2: Summary preview: {executive_summary[:200]}...")
+            logger.info("=== LLM #2: REAL TOKEN PRIMING WORKED! Executive summary generated successfully!")
+            logger.info(f"=== LLM #2: Pre-fill length: {len(response_prefill)}")
+            logger.info(f"=== LLM #2: Continuation length: {len(continuation)}")
+            logger.info(f"=== LLM #2: Total summary length: {len(executive_summary)}")
+            logger.info(f"=== LLM #2: Summary preview: {executive_summary[:200]}...")
 
             return {
                 "success": True,
